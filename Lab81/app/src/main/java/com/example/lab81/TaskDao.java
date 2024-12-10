@@ -23,4 +23,8 @@ public interface TaskDao {
 
     @Query("SELECT * FROM tasks")
     LiveData<List<TaskModel>> getAllTasks();
+
+    @Query("SELECT COUNT(*) FROM tasks")
+    int getCount();
+
 }

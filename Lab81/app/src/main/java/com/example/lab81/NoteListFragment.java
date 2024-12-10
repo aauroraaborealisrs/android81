@@ -46,7 +46,7 @@ public class NoteListFragment extends Fragment {
         }
     }
 
-    @Override
+    /*@Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_note_list, container, false);
@@ -66,5 +66,24 @@ public class NoteListFragment extends Fragment {
         });
 
         return view;
+    }*/
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_note_list, container, false);
+
+        recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        taskViewModel = new ViewModelProvider(this).get(TaskViewModel.class);
+
+        // Передаём оба интерфейса: OnNoteClickListener и OnTaskChanged
+        adapter = new TaskAdapter(taskViewModel.getAllTasks(), (OnNoteClickListener) getActivity(), (OnTaskChanged) getActivity());
+        recyclerView.setAdapter(adapter);
+
+        taskViewModel.getAllTasks().observe(getViewLifecycleOwner(), tasks -> adapter.notifyDataSetChanged());
+
+        return view;
     }
+
 }

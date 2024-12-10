@@ -49,7 +49,7 @@ public class DetailFragment extends Fragment {
         }
 
 
-        saveBtn.setOnClickListener(v -> {
+        /*saveBtn.setOnClickListener(v -> {
             String name = nameInput.getText().toString();
             String description = descriptionInput.getText().toString();
             if (!name.isEmpty() && !description.isEmpty()) {
@@ -62,7 +62,35 @@ public class DetailFragment extends Fragment {
             else {
                 Toast.makeText(requireContext(), "Введите название и описание заметки", Toast.LENGTH_SHORT).show();
             }
+        });*/
+
+        saveBtn.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            String description = descriptionInput.getText().toString().trim();
+
+            if (!name.isEmpty() && !description.isEmpty()) {
+                if (task == null) {
+                    task = new TaskModel(name, description);
+                } else {
+                    task.setName(name);
+                    task.setDescription(description);
+                    task.setCompleted(completedCheckBox.isChecked());
+                }
+
+                if (task.getId() == 0) { // Если задача новая, вставляем
+                    taskViewModel.insert(task);
+                } else { // Если задача уже существует, обновляем
+                    taskViewModel.update(task);
+                }
+
+                Toast.makeText(requireContext(), "Заметка сохранена", Toast.LENGTH_SHORT).show();
+                requireActivity().getSupportFragmentManager().popBackStack();
+            } else {
+                Toast.makeText(requireContext(), "Введите название и описание заметки", Toast.LENGTH_SHORT).show();
+            }
         });
+
+
 
         deleteBtn.setOnClickListener(v -> {
             taskViewModel.delete(task);

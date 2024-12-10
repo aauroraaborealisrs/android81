@@ -21,7 +21,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
-public class MainActivity extends AppCompatActivity implements OnNoteClickListener {
+public class MainActivity extends AppCompatActivity implements OnNoteClickListener, OnTaskChanged {
 
     private static final String task_key = "TASK";
     private TaskViewModel taskViewModel;
@@ -49,10 +49,35 @@ public class MainActivity extends AppCompatActivity implements OnNoteClickListen
             });
         }
 
-        btnAdd.setOnClickListener(view -> {
+        /*btnAdd.setOnClickListener(view -> {
             TaskModel task = new TaskModel("Новая заметка", "Описание заметки");
             taskViewModel.insert(task);
+        });*/
+
+        btnAdd.setOnClickListener(view -> {
+            // Создаём пустую заметку, но не сохраняем её в базу
+            TaskModel task = new TaskModel("", "");
+
+            // Передаём пустую заметку в DetailFragment
+            View detail_container = findViewById(R.id.fragment_detail_container);
+            if (detail_container != null) {
+                DetailFragment details = new DetailFragment();
+                Bundle args = new Bundle();
+                args.putSerializable(task_key, task);
+                details.setArguments(args);
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_detail_container, details)
+                        .addToBackStack(null)
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .commit();
+            } else {
+                Bundle args = new Bundle();
+                args.putSerializable(task_key, task);
+                NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+                navController.navigate(R.id.action_noteListFragment_to_detailFragment, args);
+            }
         });
+
     }
 
     @Override
@@ -82,4 +107,10 @@ public class MainActivity extends AppCompatActivity implements OnNoteClickListen
             navController.navigate(R.id.action_noteListFragment_to_detailFragment, args);
         }
     }
+
+    @Override
+    public void onTaskCheckboxChanged(TaskModel task) {
+        taskViewModel.update(task); // Сохраняем изменения в базе данных
+    }
+
 }
